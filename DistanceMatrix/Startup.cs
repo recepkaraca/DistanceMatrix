@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DistanceMatrix.Repositories;
+using DistanceMatrix.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Neo4j.Driver;
 
 namespace DistanceMatrix
 {
@@ -31,6 +34,15 @@ namespace DistanceMatrix
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DistanceMatrix", Version = "v1" });
             });
+            services.AddScoped<IEnvironmentRepository, EnvironmentRepository>();
+            services.AddScoped<IEnvironmentService, EnvironmentService>();
+            services.AddSingleton(GraphDatabase.Driver(
+                Configuration.GetSection("NEO4J_URI").Value,
+                AuthTokens.Basic(
+                    Configuration.GetSection("NEO4J_USER").Value,
+                    Configuration.GetSection("NEO4J_PASSWORD").Value
+                )
+            ));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
