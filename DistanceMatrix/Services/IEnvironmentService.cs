@@ -5,5 +5,6 @@ namespace DistanceMatrix.Services
     public interface IEnvironmentService
     {
         Task Create();
+        Task Delete();
     }
 }

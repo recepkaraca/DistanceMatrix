@@ -4,6 +4,7 @@ namespace DistanceMatrix.Repositories
 {
     public interface IEnvironmentRepository
     {
-        Task<int> Create(long nodeCount);
+        Task Create(long nodeCount);
+        Task Delete();
     }
 }

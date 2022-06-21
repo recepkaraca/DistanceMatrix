@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using DistanceMatrix.Repositories;
 
@@ -12,10 +13,14 @@ namespace DistanceMatrix.Services
             _environmentRepository = environmentRepository;
         }
         
-        public Task Create()
+        public async Task Create()
         {
-            _environmentRepository.Create(1);
-            return Task.CompletedTask;
+            await _environmentRepository.Create(1);
+        }
+        
+        public async Task Delete()
+        {
+            await _environmentRepository.Delete();
         }
     }
 }

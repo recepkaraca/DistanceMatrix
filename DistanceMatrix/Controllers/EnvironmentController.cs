@@ -20,5 +20,12 @@ namespace DistanceMatrix.Controllers
             _environmentService.Create();
             return Ok();
         }
+        
+        [HttpDelete]
+        public IActionResult Delete()
+        {
+            _environmentService.Delete();
+            return Ok();
+        }
     }
 }
