@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using DistanceMatrix.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,9 +16,9 @@ namespace DistanceMatrix.Controllers
         }
         
         [HttpPost]
-        public IActionResult Create()
+        public async Task<IActionResult> Create(int nodeCount)
         {
-            _environmentService.Create();
+            await _environmentService.Create(nodeCount);
             return Ok();
         }
         

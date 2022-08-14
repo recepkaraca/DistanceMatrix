@@ -13,9 +13,9 @@ namespace DistanceMatrix.Services
             _environmentRepository = environmentRepository;
         }
         
-        public async Task Create()
+        public async Task Create(int nodeCount)
         {
-            await _environmentRepository.Create(1);
+            await _environmentRepository.Create(nodeCount);
         }
         
         public async Task Delete()

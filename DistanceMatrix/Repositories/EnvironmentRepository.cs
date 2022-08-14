@@ -17,8 +17,11 @@ namespace DistanceMatrix.Repositories
         {
             await Transaction(async t =>
             {
-                await t.RunAsync("CREATE (Location:location{code: \"M1.22\"})");
-                await t.RunAsync("CREATE (Location:location{code: \"M1.23\"})");
+                for (int i = 1; i <= nodeCount; i++)
+                {
+                    await t.RunAsync($"CREATE (Location:location{{code: \"M1.{i}\"}})");
+                    Console.WriteLine($"Current i: {i}");
+                }
             });
         }
 
