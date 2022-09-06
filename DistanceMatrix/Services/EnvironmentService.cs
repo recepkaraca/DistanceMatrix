@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using DistanceMatrix.Entities;
+using DistanceMatrix.Objects;
 using DistanceMatrix.Objects.Requests;
 using DistanceMatrix.Repositories;
 
@@ -29,6 +27,11 @@ namespace DistanceMatrix.Services
         public async Task Delete()
         {
             await _environmentRepository.Delete();
+        }
+        
+        public Task<Distance> GetRelation(GetRelationRequest request)
+        {
+            return _environmentRepository.GetRelation(request);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using DistanceMatrix.Entities;
+using DistanceMatrix.Objects;
 using DistanceMatrix.Objects.Requests;
 using Neo4j.Driver;
 using Neo4jClient;
@@ -62,7 +63,8 @@ namespace DistanceMatrix.Repositories
         public async Task CreateRelations(CreateRelationRequest request)
         {
             Stopwatch sw = new Stopwatch();
-            var relationCount = 1000;
+            sw.Start();
+            var relationCount = 3;
             for (int i = 1; i <= relationCount; i++)
             {
                 for (int j = i; j <= relationCount; j++)
@@ -95,6 +97,26 @@ namespace DistanceMatrix.Repositories
                 .ExecuteWithoutResultsAsync();
         }
 
+        public async Task<Distance> GetRelation(GetRelationRequest request)
+        {
+            var result = await _client.Cypher.Match($"(fromLocation:Location)-[r:Distance]->(toLocation:Location)")
+                .Where((Location fromLocation, Location toLocation) => fromLocation.AreaCode == request.FromAreaCode
+                                                                       && fromLocation.Corridor == request.FromCorridor
+                                                                       && fromLocation.Module == request.FromModule
+                                                                       && toLocation.AreaCode == request.ToAreaCode
+                                                                       && toLocation.Corridor == request.ToCorridor
+                                                                       && toLocation.Module == request.ToModule
+                )
+                .Return((fromLocation, toLocation, r) => new Distance
+                {
+                    Value = r.As<Distance>().Value
+                })
+                .ResultsAsync;
+
+            return result.FirstOrDefault();
+        }
+        
+        
         /*private static void WithDatabase(SessionConfigBuilder sessionConfigBuilder)
         {
             var neo4JVersion = System.Environment.GetEnvironmentVariable("NEO4J_VERSION") ?? "";

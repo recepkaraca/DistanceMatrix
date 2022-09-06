@@ -36,5 +36,12 @@ namespace DistanceMatrix.Controllers
             _environmentService.Delete();
             return Ok();
         }
+        
+        [HttpGet("relation")]
+        public async Task<IActionResult> GetRelation([FromQuery] GetRelationRequest request)
+        {
+            var distance = await _environmentService.GetRelation(request);
+            return Ok(distance);
+        }
     }
 }
