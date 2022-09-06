@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using DistanceMatrix.Entities;
+using DistanceMatrix.Objects.Requests;
 using DistanceMatrix.Repositories;
 
 namespace DistanceMatrix.Services
@@ -13,9 +16,14 @@ namespace DistanceMatrix.Services
             _environmentRepository = environmentRepository;
         }
         
-        public async Task Create(int nodeCount)
+        public async Task CreateNodes(int nodeCount)
         {
-            await _environmentRepository.Create(nodeCount);
+            await _environmentRepository.CreateNodes(nodeCount);
+        }
+
+        public async Task CreateRelations(CreateRelationRequest request)
+        {
+            await _environmentRepository.CreateRelations(request);
         }
         
         public async Task Delete()

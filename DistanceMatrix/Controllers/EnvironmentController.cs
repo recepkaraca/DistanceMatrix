@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using DistanceMatrix.Objects.Requests;
 using DistanceMatrix.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,13 +16,20 @@ namespace DistanceMatrix.Controllers
             _environmentService = environmentService;
         }
         
-        [HttpPost]
-        public async Task<IActionResult> Create(int nodeCount)
+        [HttpPost("nodes")]
+        public async Task<IActionResult> CreateNodes(int nodeCount)
         {
-            await _environmentService.Create(nodeCount);
+            await _environmentService.CreateNodes(nodeCount);
             return Ok();
         }
         
+        [HttpPost("relations")]
+        public async Task<IActionResult> CreateNodes(CreateRelationRequest request)
+        {
+            await _environmentService.CreateRelations(request);
+            return Ok();
+        }
+
         [HttpDelete]
         public IActionResult Delete()
         {

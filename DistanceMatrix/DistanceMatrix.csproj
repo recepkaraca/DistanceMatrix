@@ -6,6 +6,7 @@
 
     <ItemGroup>
         <PackageReference Include="Neo4j.Driver" Version="4.4.0" />
+        <PackageReference Include="Neo4jClient" Version="4.1.26" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     </ItemGroup>
 

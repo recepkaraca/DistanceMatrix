@@ -1,10 +1,14 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using DistanceMatrix.Entities;
+using DistanceMatrix.Objects.Requests;
 
 namespace DistanceMatrix.Repositories
 {
     public interface IEnvironmentRepository
     {
-        Task Create(long nodeCount);
+        Task CreateNodes(long nodeCount);
+        Task CreateRelations(CreateRelationRequest request);
         Task Delete();
     }
 }

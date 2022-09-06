@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Neo4j.Driver;
+using Neo4jClient;
 
 namespace DistanceMatrix
 {
@@ -36,13 +37,14 @@ namespace DistanceMatrix
             });
             services.AddScoped<IEnvironmentRepository, EnvironmentRepository>();
             services.AddScoped<IEnvironmentService, EnvironmentService>();
-            services.AddSingleton(GraphDatabase.Driver(
+            services.AddSingleton(GetGraphClient);
+            /*services.AddSingleton(GraphDatabase.Driver(
                 Configuration.GetSection("NEO4J_URI").Value,
                 AuthTokens.Basic(
                     Configuration.GetSection("NEO4J_USER").Value,
                     Configuration.GetSection("NEO4J_PASSWORD").Value
                 )
-            ));
+            ));*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,6 +64,16 @@ namespace DistanceMatrix
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        }
+        
+        private IGraphClient GetGraphClient(IServiceProvider provider)
+        {
+            //Create our IGraphClient instance.
+            var client = new BoltGraphClient(Configuration["Neo4j:Host"], Configuration["Neo4j:User"], Configuration["Neo4j:Pass"]);
+            //We have to connect - as this is fully async, we need to 'Wait()'
+            client.ConnectAsync().Wait();
+
+            return client;
         }
     }
 }

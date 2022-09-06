@@ -1,19 +1,26 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
+using DistanceMatrix.Entities;
+using DistanceMatrix.Objects.Requests;
 using Neo4j.Driver;
+using Neo4jClient;
 
 namespace DistanceMatrix.Repositories
 {
     public class EnvironmentRepository : IEnvironmentRepository
     {
-        private readonly IDriver _driver;
+        /*private readonly IDriver _driver;*/
+        private readonly IGraphClient _client;
 
-        public EnvironmentRepository(IDriver driver)
+        public EnvironmentRepository( /*IDriver driver, */ IGraphClient client)
         {
-            _driver = driver;
+            _client = client;
         }
 
-        public async Task Create(long nodeCount)
+        /*public async Task Create(long nodeCount)
         {
             await Transaction(async t =>
             {
@@ -23,18 +30,72 @@ namespace DistanceMatrix.Repositories
                     Console.WriteLine($"Current i: {i}");
                 }
             });
+        }*/
+
+        public async Task CreateNodes(long nodeCount)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            var module = 1;
+            var corridor = 1;
+            for (int i = 1; i <= nodeCount; i++)
+            {
+                await _client.Cypher
+                    .Create($"(:Location {{areaCode: \"1A\", corridor: \"{corridor}\", module: {module}}})")
+                    .ExecuteWithoutResultsAsync();
+
+                if (module % 1000 == 0)
+                {
+                    module = 0;
+                    corridor++;
+                }
+
+                module++;
+
+                Console.WriteLine($"Current i: {i}");
+            }
+
+            Console.WriteLine($"{nodeCount} node created. Elapsed time: {sw.Elapsed.TotalSeconds}");
+            sw.Stop();
+        }
+
+        public async Task CreateRelations(CreateRelationRequest request)
+        {
+            Stopwatch sw = new Stopwatch();
+            var relationCount = 1000;
+            for (int i = 1; i <= relationCount; i++)
+            {
+                for (int j = i; j <= relationCount; j++)
+                {
+                    await _client.Cypher.Match($"(l)")
+                        .Where((Location l) => l.AreaCode == "1A" && l.Corridor == "1" &&
+                                               l.Module == i)
+                        .Match("(m)")
+                        .Where((Location m) => m.AreaCode == "1A" && m.Corridor == "1" &&
+                                               m.Module == j)
+                        .Merge($"(l)-[:Distance{{value:1000}}]-(m)")
+                        .ExecuteWithoutResultsAsync();
+                }
+
+                Console.WriteLine($"Relation count: {i}");
+            }
+            
+            Console.WriteLine($"{relationCount} relation created. Elapsed time: {sw.Elapsed.TotalSeconds}");
+            sw.Stop();
         }
 
         public async Task Delete()
         {
-            await Transaction(async t =>
-            {
-                await t.RunAsync("match ()-[r]-() delete (r);");
-                await t.RunAsync("match(n) delete (n);");
-            });
+            await _client.Cypher.Match("()-[r]-()")
+                .Delete("r")
+                .ExecuteWithoutResultsAsync();
+
+            await _client.Cypher.Match("(n)")
+                .Delete("(n)")
+                .ExecuteWithoutResultsAsync();
         }
 
-        private static void WithDatabase(SessionConfigBuilder sessionConfigBuilder)
+        /*private static void WithDatabase(SessionConfigBuilder sessionConfigBuilder)
         {
             var neo4JVersion = System.Environment.GetEnvironmentVariable("NEO4J_VERSION") ?? "";
             if (!neo4JVersion.StartsWith("4"))
@@ -89,6 +150,6 @@ namespace DistanceMatrix.Repositories
             {
                 await session.CloseAsync();
             }
-        }
+        }*/
     }
 }
